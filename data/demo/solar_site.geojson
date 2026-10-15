@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_demo_site_not_a_real_parcel",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "SIM-SOLAR-01",
+        "name": "Polygon contoh sintetis",
+        "source": "SYNTHETIC_DEMO",
+        "land_ownership": "UNKNOWN",
+        "land_use_permission": "NOT_ASSESSED"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[107.437,-6.604],[107.445,-6.604],[107.445,-6.610],[107.437,-6.610],[107.437,-6.604]]]
+      }
+    }
+  ]
+}

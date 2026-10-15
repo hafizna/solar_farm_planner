@@ -1,0 +1,5 @@
+gi_id,name,lat,lon,voltage_kv,source,verification_status
+SIM-GI-01,GI SIM Utara,-6.5200,107.3400,150,SYNTHETIC_DEMO,synthetic
+SIM-GI-02,GI SIM Barat,-6.6900,107.2600,150,SYNTHETIC_DEMO,synthetic
+SIM-GI-03,GI SIM Timur,-6.6450,107.6200,150,SYNTHETIC_DEMO,synthetic
+SIM-GI-04,GI SIM Selatan,-6.8100,107.4650,70,SYNTHETIC_DEMO,synthetic

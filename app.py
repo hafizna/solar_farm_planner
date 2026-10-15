@@ -203,7 +203,7 @@ report = {
         "performance_ratio": performance_ratio,
         "plane_of_array_factor": poa_factor,
     },
-    "substations": nearby.where(nearby.notna(), None).to_dict(orient="records"),
+    "substations": json.loads(nearby.to_json(orient="records")),
     "substation_dataset_provenance": station_provenance,
     "out_of_scope": [
         "electrical connectivity validation", "hosting capacity", "N-1",
@@ -212,7 +212,7 @@ report = {
 }
 st.download_button(
     "Unduh hasil screening (JSON)",
-    json.dumps(report, ensure_ascii=False, indent=2, default=str),
+    json.dumps(report, ensure_ascii=False, indent=2, default=str, allow_nan=False),
     file_name="solar_screening_report.json",
     mime="application/json",
 )

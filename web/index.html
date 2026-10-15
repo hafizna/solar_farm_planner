@@ -10,6 +10,21 @@
 <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
+<div id="demoGate" class="demo-gate" role="dialog" aria-modal="true" aria-labelledby="demoTitle">
+ <div class="demo-auth-card">
+  <div class="demo-auth-mark">G<span>·</span></div>
+  <div class="demo-auth-kicker">GEORENSIS / SOLAR</div>
+  <h1 id="demoTitle">Workspace perencanaan PLTS</h1>
+  <p>Eksplorasi lokasi, jaringan GI 70/150 kV, dan skenario pengembangan PLTS.</p>
+  <div class="demo-warning"><b>Lingkungan simulasi.</b> Ini hanya gerbang masuk demo, bukan autentikasi atau pengamanan data. Jangan unggah data PLN rahasia.</div>
+  <form id="demoLoginForm">
+   <label>Nama untuk sesi demo<input id="demoUserName" name="name" placeholder="Contoh: Analis Transmisi" maxlength="45" required autocomplete="off"></label>
+   <label>Peran<select id="demoRole"><option>Analis Transmisi</option><option>Perencana Pengembangan</option><option>Reviewer / Direksi</option></select></label>
+   <button type="submit">Masuk ke workspace <span>→</span></button>
+  </form>
+  <div class="demo-auth-foot">Tanpa password · Sesi hanya di browser ini · Akses demo tidak dibatasi server</div>
+ </div>
+</div>
 <div class="shell">
   <nav class="rail" id="rail" aria-label="Navigasi utama"></nav>
 
@@ -122,5 +137,6 @@
 <script src="./assets/demo-data.js"></script>
 <script src="./assets/map-model.js"></script>
 <script src="./assets/pages.js"></script>
+<script src="./assets/onboarding.js"></script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+{
+  "name": "solar-farm-planner-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Georensis solar siting concept frontend; simulation data only",
+  "scripts": {
+    "prepare:maps": "node scripts/prepare-leaflet.cjs",
+    "dev": "npm run prepare:maps && node scripts/server.cjs",
+    "build": "node scripts/build.cjs"
+  },
+  "dependencies": {"leaflet": "1.9.4"},
+  "engines": {"node": ">=18"}
+}

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solar Farm Planner — Georensis PoC</title>
+<!-- GIS site/asset datasets are simulation. Base tiles require internet; offline outline is schematic. -->
+<!-- System-font typography: no remote font service required. -->
+<link rel="stylesheet" href="./leaflet/leaflet.css">
+<link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="Navigasi utama"></nav>
+
+  <div class="main" id="main">
+    <header class="top">
+      <span class="srv"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/></svg>PoC · Simulasi <i></i></span>
+      <div class="ttl">
+        <b id="topTitle">Georensis Solar · Peta Potensi PLTS</b>
+        <div class="crumbs" id="topCrumbs"></div>
+      </div>
+      <div class="sp"></div>
+      <div class="contact">Referensi data: <b>RUPTL 2025–2034</b> <span style="opacity:.4">|</span> Jaringan/lahan: <b>DATA SIMULASI</b></div>
+      <div class="clock"><span id="clock">–</span><small>● SIMULASI — GI 70/150 kV SAJA</small></div>
+      <div class="ui-pref" aria-label="Preferensi tampilan">
+        <label for="fontSelect" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Tipografi</label>
+        <select id="fontSelect" aria-label="Jenis font">
+          <option value="system">Segoe UI</option>
+          <option value="arial">Arial</option>
+          <option value="tahoma">Tahoma</option>
+        </select>
+        <button type="button" id="themeToggle" class="pref-btn" aria-label="Ubah tema terang atau gelap" aria-pressed="false">◐ <span id="themeLabel">Tema</span></button>
+      </div>
+      <button class="slbtn" id="slOpen"><svg class="i" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Shortlist Lahan <span class="n" id="slCount">0</span></button>
+    </header>
+
+    <section class="sub">
+      <div class="lhs">
+        <div class="bc" id="bc"></div>
+        <div class="h1row"><span class="step" id="stepNo">1</span><h1 id="h1"></h1></div>
+        <p id="h1sub"></p>
+      </div>
+      <div class="rhs" id="rhs"></div>
+    </section>
+
+    <div class="tabbar" id="tabbar" hidden>
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div id="tabFilters"></div>
+      <div class="meta" id="tabMeta"></div>
+    </div>
+
+    <div id="pageView"></div>
+    <div class="body" id="body">
+      <div class="stage">
+        <div id="map" aria-label="Peta"></div>
+<div id="routeTools" class="route-tools" aria-label="Pengaturan rute SUTT dan SKTT">
+ <div class="rt-title">KORIDOR TRANSMISI <span>SIMULASI</span></div>
+ <label>Jenis koneksi
+   <select id="routeMode"><option value="auto">Bandingkan SUTT / SKTT</option><option value="sutt">SUTT 70/150 kV</option><option value="sktt">SKTT 70/150 kV</option></select>
+ </label>
+ <label class="rt-check"><input id="demoConstraints" type="checkbox"> Contoh hambatan air & permukiman (sintetis)</label>
+ <label class="rt-file">Unggah hambatan GeoJSON <input id="barriersFile" type="file" accept=".json,.geojson,application/geo+json"></label>
+ <div id="rtStatus">Garis tidak mewakili ROW; pilih GI dan lahan untuk menghitung koridor.</div>
+ <div class="rt-actions"><button type="button" id="rtClear">Hapus layer hambatan</button></div>
+</div>
+        <div class="tabview" id="tabview"></div>
+        <div class="stats" id="stats"></div>
+        <div class="mlegend" id="mlegend" hidden></div>
+        <div class="offline-note" id="offline" role="status" aria-live="polite">Peta dasar online tidak termuat. Menggunakan garis pulau sederhana.</div>
+        <label class="basemap-chooser" for="baseMapSelect">Peta dasar
+          <select id="baseMapSelect" aria-label="Pilih gaya peta dasar">
+            <option value="clean" selected>Minimal · Esri Light Gray</option>
+            <option value="streets">Jalan &amp; kota · Esri Streets</option>
+            <option value="topo">Topografi · Esri Topographic</option>
+            <option value="imagery">Citra satelit · Esri Imagery</option>
+            <option value="carto">CARTO Positron (alternatif)</option>
+            <option value="osm">OpenStreetMap (alternatif)</option>
+            <option value="outline">Outline Indonesia (tanpa basemap)</option>
+          </select>
+        </label>
+        <div id="mapDiagnostics" class="map-diagnostics" hidden>
+          <b>Status layanan peta</b>
+          <span id="mapDiagText">–</span>
+          <a href="https://tile.openstreetmap.org/9/407/261.png" target="_blank" rel="noopener noreferrer">Tes membuka satu tile OSM</a>
+        </div>
+        <button class="mbtn list" id="listBtn"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Lihat daftar provinsi</button>
+        <div class="hint" id="hint"><i></i><span id="hintTxt"></span></div>
+        <aside class="drawer left" id="provDrawer" aria-label="Daftar provinsi">
+          <header><b>Daftar provinsi</b><button data-close="provDrawer" aria-label="Tutup">×</button></header>
+          <div style="padding:10px 14px 0"><input class="srch" style="width:100%" id="provSearch" placeholder="Cari provinsi…"></div>
+          <div class="dc" id="provList"></div>
+        </aside>
+        
+      </div>
+      <aside class="panel" id="panel"></aside>
+    </div>
+  </div>
+</div>
+<aside class="drawer right fixed" id="slDrawer" aria-label="Shortlist lahan">
+          <header><b>Shortlist lahan</b><button data-close="slDrawer" aria-label="Tutup">×</button></header>
+          <div class="dc" id="slList"></div>
+        </aside>
+<aside class="drawer right fixed" id="ntDrawer" aria-label="Notifikasi"><header><b>Notifikasi</b><button data-close="ntDrawer" aria-label="Tutup">×</button></header><div class="dc" id="ntList"></div></aside>
+<div class="modal-bg" id="mdlBg"></div>
+<div class="toast" id="toast"></div>
+
+
+
+
+
+
+
+
+
+
+<script src="./leaflet/leaflet.js"></script>
+<script>window.L||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"><\/script>')</script>
+<script>window.L||document.write('<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"><\/script>')</script>
+<script src="./assets/bootstrap-status.js"></script>
+<script src="./assets/ui-preferences.js"></script>
+<script src="./assets/demo-data.js"></script>
+<script src="./assets/map-model.js"></script>
+<script src="./assets/pages.js"></script>
+</body>
+</html>

@@ -6,8 +6,16 @@
   "scripts": {
     "prepare:maps": "node scripts/prepare-leaflet.cjs",
     "dev": "npm run prepare:maps && node scripts/server.cjs",
-    "build": "node scripts/build.cjs"
+    "build": "node scripts/build.cjs",
+    "test:e2e": "playwright test"
   },
-  "dependencies": {"leaflet": "1.9.4"},
-  "engines": {"node": ">=18"}
+  "dependencies": {
+    "leaflet": "1.9.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
 }

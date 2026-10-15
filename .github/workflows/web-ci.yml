@@ -1,0 +1,33 @@
+name: Georensis Static Web
+
+on:
+  push:
+    paths:
+      - "web/**"
+      - ".github/workflows/web-ci.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/web-ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - name: Verify static assets and JavaScript syntax
+        run: |
+          test -s dist/index.html
+          test -s dist/leaflet/leaflet.js
+          test -s dist/leaflet/leaflet.css
+          test -s dist/assets/demo-data.js
+          test -s dist/assets/pages.js
+          for file in assets/*.js scripts/*.cjs; do node --check "$file"; done

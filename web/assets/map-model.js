@@ -451,14 +451,14 @@ function header(){
 /* ---------- tabs ---------- */
 function tabs(){
   const tb=$('tabbar');
-  if(S.level===1){tb.hidden=true;return}
   tb.hidden=false;
   let t;
-  if(S.level===2){const p=PROV[S.prov];t=[['map','Peta',null,'map'],['gi','Daftar GI',p.gis.length,'zap'],['ruptl','Rencana RUPTL',rowsOf(p.key).length,'file']]}
+  if(S.level===1){t=[['map','Peta',null,'map'],['gi','Daftar GI',D.gis.filter(g=>g.kv===70||g.kv===150).length,'zap'],['ruptl','Rencana RUPTL',D.rows.filter(r=>(S.scen==='B'?r.inB:r.inA)&&(S.jenis==='all'||r.jenis===S.jenis)).length,'file']]}
+  else if(S.level===2){const p=PROV[S.prov];t=[['map','Peta',null,'map'],['gi','Daftar GI',p.gis.length,'zap'],['ruptl','Rencana RUPTL',rowsOf(p.key).length,'file']]}
   else{const g=GI[S.gi];t=[['map','Peta',null,'map'],['land','Daftar lahan',g.lands.length,'list'],['ruptl','Rencana RUPTL sistem',rowsOf(g.prov,g.sistem).length,'file']]}
   $('tabs').innerHTML=t.map(([k,l,c,i])=>`<button role="tab" data-tab="${k}" class="${S.tab===k?'on':''}">${ic(i,'style="width:15px;height:15px"')}${l}${c!=null?`<span class="c">${c}</span>`:''}</button>`).join('');
   $('tabFilters').innerHTML=filtersHTML().replace('class="filt"','class="filt" style="flex-direction:row;gap:14px"');
-  $('tabMeta').textContent=S.level===2?`Sumber target: RUPTL 2025–2034 · ${SCEN[S.scen]}`:`Tegangan: ${GI[S.gi].kv} kV · Sistem: ${GI[S.gi].sistem}`;
+  $('tabMeta').textContent=S.level===1?'Akses cepat nasional · GI simulasi':S.level===2?`Sumber target: RUPTL 2025–2034 · ${SCEN[S.scen]}`:`Tegangan: ${GI[S.gi].kv} kV · Sistem: ${GI[S.gi].sistem}`;
 }
 
 /* ---------- render utama ---------- */
@@ -772,6 +772,7 @@ $('tabs').addEventListener('click',function(ev){
   ev.preventDefault();ev.stopPropagation();
   const tab=t.dataset.tab;
   if(!['map','gi','land','ruptl'].includes(tab))return;
+  if(S.level===1&&tab!=='map'){goPage(tab==='gi'?'gi':'ruptl');return;}
   S.tab=tab;
   this.querySelectorAll('[data-tab]').forEach(b=>{
     const selected=b.dataset.tab===tab;

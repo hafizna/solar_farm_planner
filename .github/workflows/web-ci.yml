@@ -31,3 +31,7 @@ jobs:
           test -s dist/assets/demo-data.js
           test -s dist/assets/pages.js
           for file in assets/*.js scripts/*.cjs; do node --check "$file"; done
+      - name: Install Chromium for E2E tests
+        run: npx playwright install --with-deps chromium
+      - name: Test entry, navigation, data pages and logout
+        run: npm run test:e2e

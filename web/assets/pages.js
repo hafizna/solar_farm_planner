@@ -16,9 +16,11 @@ Object.assign(IC,{
 });
 
 const MENU=[
+ ['beranda','Beranda','grid'],
  ['peta','Peta Potensi Lahan','map'],
+ ['gi','Daftar GI','zap'],
  ['ringkasan','Ringkasan Eksekutif','grid'],
- ['ruptl','Target RUPTL','target'],
+ ['ruptl','Rencana RUPTL','target'],
  ['lahan','Kandidat Lahan','layers'],
  ['validasi','Validasi Lahan','check'],
  ['ranking','Ranking & Rekomendasi','rank'],
@@ -36,6 +38,7 @@ $('rail').innerHTML=`<div class="logo" title="PLN">${LOGO}<b>PLN</b></div>`+
 
 /* ---------- state halaman ---------- */
 const F={
+ gi:{prov:'',q:'',kv:''},
  ruptl:{wil:'',prov:'',status:'',dev:'',kat:'',q:''},
  lahan:{prov:'',gi:'',kat:'',status:'',tahap:'',zona:'',min:'0',q:'',sort:'skor',dir:-1,page:0},
  val:{prov:'',q:''},
@@ -82,7 +85,7 @@ function yearBars(rows,h=150){
 const jLegend=`<span class="lg"><span class="kd" style="background:var(--blue2)"></span>PLTS</span><span class="lg"><span class="kd" style="background:#e0a400"></span>PLTS + BESS</span>`;
 function pageHead(id,sub,acts=''){
   const m=[...MENU,...MENU_B].find(x=>x[0]===id);
-  return `<div class="phead"><div><div class="bc"><a data-page="peta">${ic('home','style="width:13px;height:13px"')} Beranda</a><span class="sep">›</span><span class="cur">${m[1]}</span></div>
+  return `<div class="phead"><div><div class="bc"><a data-page="beranda">${ic('home','style="width:13px;height:13px"')} Beranda</a><span class="sep">›</span><span class="cur">${m[1]}</span></div>
   <h1>${ic(m[2],'style="width:21px;height:21px;color:var(--blue)"')}${m[1]}</h1><p>${sub}</p></div><div class="pacts">${acts}</div></div>`;
 }
 const btn=(act,label,icn,cls='',attrs='')=>`<button class="btn ${cls}" data-act="${act}" ${attrs}>${icn?ic(icn,'style="width:15px;height:15px"'):''}${label}</button>`;
@@ -100,7 +103,7 @@ function goPage(id){
   closeDrawers();closeModal();
   if(id==='master'&&F.master.tab==='param')PD=null;
   chrome(id);
-  if(id==='peta'){map.invalidateSize();render(false);return}
+  if(id==='peta'){S.tab='map';map.invalidateSize();render(false);return}
   $('pageView').innerHTML=PAGES[id]();$('pageView').scrollTop=0;
 }
 function openMap(level,opt){if(S.page!=='peta'){closeModal();chrome('peta');map.invalidateSize()}go(level,opt)}
@@ -193,6 +196,26 @@ function bdRingkasan(){
 function ruptlFiltered(){
   const f=F.ruptl,q=f.q.toLowerCase();
   return rowsAll().filter(r=>(!f.wil||(PROV[r.prov]&&PROV[r.prov].wil===f.wil))&&(!f.prov||r.prov===f.prov)&&(!f.status||r.status===f.status)&&(!f.dev||r.dev===f.dev)&&(!f.kat||r.kat===f.kat)&&(!q||(r.nama+' '+r.sis+' '+r.prov).toLowerCase().includes(q)));
+}
+function pgBeranda(){
+ const plans=rowsAll();
+ const planned=plans.reduce((s,r)=>s+(Number(r.mw)||0),0);
+ const link=(page,title,desc,note)=>`<button class="entry-action" data-page="${page}"><span class="entry-title">${title}</span><span class="entry-desc">${desc}</span><span class="entry-note">${note} →</span></button>`;
+ return `<section class="home-intro"><div class="home-overline">GEORENSIS SOLAR · WORKSPACE DEMO</div><h1>Mulai dari proyek, bukan dari peta.</h1><p>Tentukan lokasi lahan atau titik GI terlebih dahulu. Bandingkan alternatif lokasi dan koneksi ke GI 70/150 kV. Seluruh aset, kandidat, dan parameter operasional pada demo adalah simulasi.</p></section>
+ <div class="home-metrics"><div><span>GI simulasi</span><b>${D.gis.filter(g=>g.kv===70||g.kv===150).length}</b></div><div><span>Kandidat lahan sintetis</span><b>${D.lands.length.toLocaleString('id-ID')}</b></div><div><span>Baris rencana RUPTL</span><b>${plans.length}</b></div><div><span>Target skenario terpilih</span><b>${nf0(planned)} MW</b></div></div>
+ <h2 class="home-section-title">Pilih alur kerja</h2><div class="entry-grid">
+ ${link('lahan','01 / Land-first','Mulai dari kandidat lahan dan identifikasi GI terdekat.','Jelajahi kandidat')}
+ ${link('gi','02 / Grid-first','Mulai dari GI 70/150 kV dan periksa lahan di sekitarnya.','Buka daftar GI')}
+ ${link('ruptl','03 / Project pipeline','Telusuri rencana PLTS dan PLTS + BESS berdasarkan skenario RUPTL.','Lihat rencana')}
+ ${link('peta','04 / GIS explorer','Jelajahi potensi nasional, provinsi, GI, dan koridor ilustratif.','Buka peta')}
+ </div><section class="sec home-disclaimer"><h3>Batas kemampuan versi ini</h3><p>Jarak geografis, scoring dan routing SUTT/SKTT masih bersifat pra-screening. Belum ada data bidang tanah resmi, ROW terverifikasi, data akses jalan konstruksi, hasil studi P2B, ataupun estimasi biaya proyek yang telah tervalidasi.</p></section>`;
+}
+function pgGI(){
+ const f=F.gi;const q=f.q.trim().toLowerCase();
+ const all=D.gis.filter(g=>(g.kv===70||g.kv===150)&&(!f.prov||g.prov===f.prov)&&(!f.kv||String(g.kv)===f.kv)&&(!q||(g.nama+' '+g.kab+' '+g.sistem).toLowerCase().includes(q)));
+ return pageHead('gi','Direktori GI 70/150 kV. Cari GI, lalu buka konteks lahan di peta. Seluruh data GI di demo belum terverifikasi.')+
+ `<div class="fbar">${selBox('f:gi:prov','Provinsi',provOpts(),f.prov)}${selBox('f:gi:kv','Tegangan',[['','70 dan 150 kV'],['70','70 kV'],['150','150 kV']],f.kv)}<label>Cari GI<input data-in="f:gi:q" value="${esc(f.q)}" placeholder="Nama GI, kabupaten, sistem…"></label><span class="fnote">${all.length} GI ditemukan</span></div>
+ <div id="pgBody"><div class="tblwrap"><table><thead><tr><th>GI</th><th>Provinsi</th><th>Kabupaten/Kota</th><th>Tegangan</th><th>Sistem</th><th>Jumlah lahan demo</th><th>Aksi</th></tr></thead><tbody>${all.map(g=>`<tr><td><b>${esc(g.nama)}</b></td><td>${esc(PROV[g.prov].short)}</td><td>${esc(g.kab)}</td><td>${g.kv} kV</td><td>${esc(g.sistem)}</td><td>${g.lands.length}</td><td>${btn('giMap','Lihat peta & lahan','map','sm',`data-id="${g.id}"`)}</td></tr>`).join('')}</tbody></table></div><p class="fnote">Kapasitas, beban trafo, bay, ruang interkoneksi, dan legalitas lahan belum merupakan hasil validasi teknik.</p></div>`;
 }
 function pgRuptl(){
   const f=F.ruptl;
@@ -578,7 +601,7 @@ function pgBantuan(){
    <div class="sec callout"><div><h3>Tentang data</h3><p class="sd" style="margin:4px 0 0">Target RUPTL diambil dari file Excel (${D.rows.length} baris). Data GI (10 sampel per provinsi), kandidat lahan, skor, dan proses lelang adalah simulasi. Perubahan yang Anda buat tersimpan di browser ini.</p></div>${btn('resetAll','Kembalikan semua data contoh','refresh','danger')}</div>`;
 }
 
-const PAGES={ringkasan:pgRingkasan,ruptl:pgRuptl,lahan:pgLahan,validasi:pgValidasi,ranking:pgRanking,tindak:pgTindak,master:pgMaster,unggah:pgUnggah,laporan:pgLaporan,bantuan:pgBantuan};
+const PAGES={beranda:pgBeranda,gi:pgGI,ringkasan:pgRingkasan,ruptl:pgRuptl,lahan:pgLahan,validasi:pgValidasi,ranking:pgRanking,tindak:pgTindak,master:pgMaster,unggah:pgUnggah,laporan:pgLaporan,bantuan:pgBantuan};
 const BODY={ringkasan:bdRingkasan,ruptl:bdRuptl,lahan:bdLahan,validasi:bdValidasi,ranking:bdRanking,tindak:bdTindak,master:bdMaster,unggah:bdUnggah,laporan:bdLaporan};
 
 /* =====================================================================
@@ -654,8 +677,8 @@ const ACT={
  csvLap:()=>{const provs=F.lap.prov?[PROV[F.lap.prov]]:D.provinces;dlCSV('laporan_potensi_lahan.csv',['provinsi','wilayah','target_mw','proyek','gi','lahan','luas_ha','potensi_mwp','lahan_layak_mwp','direkomendasikan'],provs.map(p=>{const s=provStats(p);return [p.short,p.wil,Math.round(s.mw*100)/100,s.n,p.gis.length,s.ls.length,Math.round(sumBy(s.ls,l=>l.luas)*10)/10,Math.round(s.mwp*10)/10,Math.round(s.mwpGood*10)/10,s.ls.filter(l=>l.tahap==='Direkomendasikan').length]}))},
  print:()=>window.print(),
  notif:()=>{const d=$('ntDrawer'),open=!d.classList.contains('open');closeDrawers();if(open){renderNotif();d.classList.add('open');N.forEach(n=>n.r=true);bell();save()}},
- logout:()=>confirmBox('Keluar dari aplikasi','Ini mock-up, jadi tidak ada sesi yang benar-benar ditutup. Data yang Anda ubah tetap tersimpan di browser.','logoutOk','Keluar'),
- logoutOk:()=>{openModal('Anda sudah keluar','<p style="margin:0">Sesi demo telah diakhiri.</p>',btn('mclose','Masuk kembali','','pri'))},
+ logout:()=>window.solarDemoLogout?.(),
+ logoutOk:()=>window.solarDemoLogout?.(),
  resetAll:()=>confirmBox('Kembalikan data contoh','Semua perubahan (shortlist, validasi, tindak lanjut, GI, unggahan, parameter) akan dihapus dan data kembali seperti awal.','resetOk','Kembalikan'),
  resetOk:()=>{try{localStorage.removeItem(STORE)}catch(e){}clearTimeout(_sv);location.reload()}
 };
@@ -686,6 +709,7 @@ document.addEventListener('input',e=>{
   const k=t.dataset.in;
   if(k.startsWith('f:')){const[,pg,fld]=k.split(':');F[pg][fld]=t.value;
     if(pg==='lahan'){F.lahan.page=0;if(fld==='prov'){F.lahan.gi='';renderPage();return}}
+    if(pg==='gi'){renderPage();return}
     refreshBody();
     if(t.tagName==='INPUT'){const n=document.querySelector(`[data-in="${k}"]`);if(n&&n!==t){n.focus();const L=n.value.length;try{n.setSelectionRange(L,L)}catch(_){}}}
     return}

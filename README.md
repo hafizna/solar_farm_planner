@@ -64,3 +64,7 @@ No API key, GPU, PLN connection, or network access is needed for the synthetic d
 5. Agree with STI/P2B on identifiers and the handoff contract; do not build a shadow grid simulator.
 
 Read 'docs/' before interpreting the results. This repository is MIT-licensed, but licensing of external datasets is independent of this code license.
+
+## Georensis static frontend
+
+The current browser workspace is in `web/` and runs independently of the original Python demo: `cd web`, `npm ci`, `npm run dev`. For static hosting (including Vercel), use `web` as the root, `npm run build`, and output directory `dist`. See [web/README.md](web/README.md) and [screening workspace](docs/screening-workspace.md). The project uses a Georensis monogram, not an official PLN brand mark.

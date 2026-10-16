@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test('demo entry, national GI/RUPTL navigation, theme and logout', async ({ page }) => {
   // External tile services are not needed to verify application navigation.
-  await page.route(/^https?:\/\/(?!127\.0\.0\.1:3000)/, route => route.abort());
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1:\d+)/, route => route.abort());
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
@@ -27,5 +27,41 @@ test('demo entry, national GI/RUPTL navigation, theme and logout', async ({ page
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
   await page.locator('#rail [data-act="logout"]').click();
   await expect(page.locator('#demoGate')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('province and GI tables receive clicks and map dragging returns', async ({ page }) => {
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1:\d+)/, route => route.abort());
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto('/');
+  await page.locator('#demoUserName').fill('Navigation audit');
+  await page.locator('#demoLoginForm button').click();
+  await page.locator('#rail [data-page="peta"]').click();
+  await page.evaluate(() => openMap(2, { prov: D.provinces.find(p => p.gis.length).key }));
+  await page.locator('#tabs [data-tab="gi"]').click();
+  await expect(page.locator('#tabview tbody tr').first()).toBeVisible();
+  await expect(page.locator('#map')).toBeHidden();
+  await page.locator('#tabview [data-gi]').first().click();
+  await page.locator('#tabs [data-tab="land"]').click();
+  const land = page.locator('#tabview [data-land]').first();
+  await expect(land).toBeVisible();
+  await land.locator('[data-star]').click();
+  await expect(page.locator('#slCount')).toHaveText('1');
+  await land.click();
+  await expect(page.locator('#map')).toBeVisible();
+  await page.locator('#tabs [data-tab="ruptl"]').click();
+  await expect(page.locator('#tabview h3')).toContainText('RUPTL');
+  await expect(page.locator('#routeTools')).toBeHidden();
+  await page.locator('#tabs [data-tab="map"]').click();
+  await expect(page.locator('#tabview')).toBeHidden();
+  await page.waitForTimeout(800);
+  const before = await page.evaluate(() => map.getCenter().lng);
+  const box = await page.locator('#map').boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2 + 40, { steps: 12 });
+  await page.mouse.up();
+  await expect.poll(() => page.evaluate(() => map.getCenter().lng)).not.toBe(before);
   expect(errors).toEqual([]);
 });

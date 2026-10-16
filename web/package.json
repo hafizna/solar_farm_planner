@@ -7,9 +7,14 @@
     "prepare:maps": "node scripts/prepare-leaflet.cjs",
     "dev": "npm run prepare:maps && node scripts/server.cjs",
     "build": "node scripts/build.cjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:portable": "npm run prepare:maps && node scripts/portable.cjs",
+    "test:unit": "node --test tests/*.test.cjs",
+    "build:pilot": "node scripts/build-kupang-pilot.cjs"
   },
   "dependencies": {
+    "@turf/turf": "^7.3.0",
+    "geotiff": "^2.1.4-beta.1",
     "leaflet": "1.9.4"
   },
   "engines": {

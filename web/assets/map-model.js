@@ -93,9 +93,9 @@ function constraintClassAt(pt,features){
   if(cls==='road'&&geom.type==='MultiLineString'&&geom.coordinates.some(x=>pointLineKm(pt,x)<.25))found.add('road');
  }return found;
 }
-function routeSearch(l,g,method){
+function routeSearch(l,g,method,options={}){
  const start=[g.lat,g.lng],end=[l.lat,l.lng],distance=hav2(...start,...end);
- const features=getConstraints(l,g),landmask=coastContains(...start)&&coastContains(...end)&&ROUTE_CTX.showCoast;
+ const features=options.features||getConstraints(l,g),landmask=coastContains(...start)&&coastContains(...end)&&ROUTE_CTX.showCoast;
  const latSpan=Math.abs(start[0]-end[0]),lonSpan=Math.abs(start[1]-end[1]);
  const pad=Math.min(.085,Math.max(.014,Math.max(latSpan,lonSpan)*.45));
  const minLat=Math.min(start[0],end[0])-pad,maxLat=Math.max(start[0],end[0])+pad;
@@ -113,8 +113,10 @@ function routeSearch(l,g,method){
   let factor=1;
   if(cls.has('urban'))factor*=method==='sutt'?12:1.65;
   if(cls.has('steep'))factor*=method==='sutt'?4:8;
-  if(cls.has('road')&&method==='sktt')factor*=.78;
-  factors[i]=Math.max(.75,factor);
+  if(cls.has('road')&&method==='sktt')factor*=options.roadPreference??.78;
+  if(cls.has('flood'))factor*=method==='sktt'?6:3;
+  if(cls.has('soil'))factor*=method==='sktt'?8:4;
+  factors[i]=Math.max(.5,factor);
  }
  // Start/end local coordinates are known connection anchors, not verified connection bays.
  if(blocks[src]||blocks[dst])return {status:'BLOCKED',method,km:null,pts:[],reason:'Titik GI atau lahan berada pada zona eksklusi / area laut dari data yang dimuat.',landmask};
@@ -123,7 +125,7 @@ function routeSearch(l,g,method){
  const closed=new Uint8Array(len),heap=[];
  const push=(cost,node)=>{heap.push([cost,node]);let i=heap.length-1;while(i>0){const p=Math.floor((i-1)/2);if(heap[p][0]<=heap[i][0])break;[heap[p],heap[i]]=[heap[i],heap[p]];i=p}};
  const pop=()=>{const top=heap[0],last=heap.pop();if(heap.length){heap[0]=last;let i=0;for(;;){let b=i,l=i*2+1,r=l+1;if(l<heap.length&&heap[l][0]<heap[b][0])b=l;if(r<heap.length&&heap[r][0]<heap[b][0])b=r;if(i===b)break;[heap[i],heap[b]]=[heap[b],heap[i]];i=b}}return top};
- const h=i=>hav2(...nodes[i],...nodes[dst])*.75;
+ const h=i=>hav2(...nodes[i],...nodes[dst])*.5;
  push(h(src),src);
  const neighbors=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
  let explored=0;
@@ -163,7 +165,7 @@ function routeSearch(l,g,method){
   constraints:features.length,gridResolutionKm:Math.max((maxLat-minLat)*111/rows,(maxLon-minLon)*111/cols)};
 }
 function corridor(l,g){
- if(!ELIGIBLE_GI_KV.has(Number(g.kv)))return {status:'INELIGIBLE',km:null,pts:[],reason:'GI wajib 70 kV atau 150 kV'};
+ if(g&&!ELIGIBLE_GI_KV.has(Number(g.kv)))return {status:'INELIGIBLE',km:null,pts:[],reason:'GI wajib 70 kV atau 150 kV'};
  if(!l||!g)return {status:'MISSING',km:null,pts:[]};
  // Avoid costly raster simulation for 1,000+ rows in national reports / tables.
  if(typeof S!=='undefined'&&(S.level!==3||S.gi!==g.id))return {status:'NOT_EVALUATED',km:null,pts:[],reason:'Aktifkan peta GI untuk hitung koridor'};
@@ -467,6 +469,7 @@ function render(fit=true){
   $('body').classList.toggle('lvl2',S.level===2);$('body').classList.toggle('lvl3',S.level===3);$('routeTools').style.display=S.level===3?'flex':'none';
   header();tabs();
   const showMap=S.level===1||S.tab==='map';
+  $('map').parentElement.classList.toggle('showing-table',!showMap);
   $('tabview').style.display=showMap?'none':'block';
   ['stats','listBtn','hint'].forEach(id=>$(id).style.display=S.level===1?'':'none');
   $('mlegend').hidden=S.level===1||!showMap;
@@ -780,6 +783,7 @@ $('tabs').addEventListener('click',function(ev){
     b.setAttribute('aria-selected',selected?'true':'false');
   });
   const showMap=tab==='map';
+  $('map').parentElement.classList.toggle('showing-table',!showMap);
   $('tabview').style.display=showMap?'none':'block';
   $('mlegend').hidden=!showMap;
   if(showMap){map.invalidateSize();return;}

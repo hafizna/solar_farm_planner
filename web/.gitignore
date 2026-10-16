@@ -1,3 +1,7 @@
 node_modules/
 leaflet/
 dist/
+.browsers/
+test-results/
+assets/vendor/
+portable/

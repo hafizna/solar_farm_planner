@@ -1,0 +1,20 @@
+﻿(function(){
+  'use strict';
+  if(!window.GEORENSIS_PORTABLE)return;
+  document.title='Georensis Solar | Peta Potensi PLTS';
+  document.getElementById('demoTitle').textContent='Masuk ke Georensis';
+  const card=document.querySelector('.demo-auth-card');
+  card.querySelector('.demo-auth-mark').innerHTML=LOGO;
+  card.querySelector(':scope > p').textContent='Jelajahi peta potensi lahan dan rencana pengembangan PLTS.';
+  card.querySelector('.demo-warning').remove();
+  const user=document.getElementById('demoUserName');
+  user.parentElement.firstChild.textContent='Nama pengguna';
+  user.placeholder='Masukkan nama pengguna';user.autocomplete='username';
+  document.getElementById('demoRole').parentElement.hidden=true;
+  document.querySelector('#demoLoginForm button').textContent='Masuk';
+  card.querySelector('.demo-auth-foot').textContent='Akses lokal tanpa akun server. Data bawaan merupakan simulasi.';
+  document.querySelector('#rail [data-page="beranda"]')?.remove();
+  document.querySelector('#rail [data-page="screening"]')?.remove();
+  const navigate=goPage;
+  goPage=function(id){navigate(id==='beranda'||id==='screening'?'peta':id);};
+})();

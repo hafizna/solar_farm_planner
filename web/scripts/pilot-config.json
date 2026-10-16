@@ -1,0 +1,46 @@
+[
+  {
+    "id": "kupang",
+    "name": "Bolok - Kupang, NTT",
+    "prefix": "KP",
+    "bbox": [
+      123.48,
+      -10.27,
+      123.56,
+      -10.21
+    ]
+  },
+  {
+    "id": "jeneponto",
+    "name": "Jeneponto, Sulawesi Selatan",
+    "prefix": "JP",
+    "bbox": [
+      119.7,
+      -5.7,
+      119.78,
+      -5.64
+    ]
+  },
+  {
+    "id": "pringgabaya",
+    "name": "Pringgabaya - Lombok Timur, NTB",
+    "prefix": "PG",
+    "bbox": [
+      116.61,
+      -8.57,
+      116.65,
+      -8.53
+    ]
+  },
+  {
+    "id": "situbondo",
+    "name": "Situbondo, Jawa Timur",
+    "prefix": "ST",
+    "bbox": [
+      114.025,
+      -7.72,
+      114.055,
+      -7.69
+    ]
+  }
+]

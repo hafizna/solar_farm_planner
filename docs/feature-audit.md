@@ -24,3 +24,15 @@ Legend: **Implemented demo** (UI/workflow works on synthetic data), **Scenario-o
 | User authentication and shared data management | Not implemented | Demo entry does not protect Vercel deployment or provide organizational user accounts. |
 
 **Do not merge the demo label with engineering feasibility.** The next major technical increment should be actual GIS ingestion, polygon/constraints, audited alignment alternatives, and confidence labels.
+
+## Geographic screening increment
+
+The new **Screening & Koridor** page adds polygon import/drawing, net area after overlapping exclusions, representative-point road distance, user-supplied constraint exposure, three candidate GIs × SUTT/SKTT, selectable alignments, cost ranges only from explicit user benchmarks, external study status import, and JSON/GeoJSON/CSV handoff. This supersedes the polygon-not-implemented row **for this page only**. DEM raster processing, verified GIS acquisition, detailed civil/electrical design, and automatic verification of study approvals remain unimplemented. See [screening-workspace.md](screening-workspace.md).
+
+## Portable / online increment
+
+Beranda now has one primary project workflow. A generated single-file HTML app works without hosting; per-project HTML reports embed their map, evidence and interactions for offline sharing. Optional online adapters fetch NASA climatology, within-parcel DEM slope/WorldCover indicators, OSM road/GI candidates, and BNPB point-hazard indicators. These supersede the earlier blanket "no live ingestion" and "no frontend solar resource" rows for the new screening workspace only. They do not provide verified parcel ownership, corridor-wide DEM, actual GI capacity/bay approval, or production GIS completeness. Availability and CORS vary; see [portable-and-live.md](portable-and-live.md).
+
+## Kupang pre-registration pilot
+
+The shareable map now also contains **Penjajakan & Alokasi**: eight public-raster-derived indicative areas and 16 SUTT/SKTT alternatives toward GI Bolok. No default applicant, receiving capacity, quota or CAPEX is presented as real. Users explicitly supply those inputs or load labeled synthetic scenarios. The pure allocation engine compares whole-project combinations under regional/GI/budget limits, with one allocation per underlying area. HTML reports work offline. See [kupang-portfolio.md](kupang-portfolio.md) and the [source/algorithm register](../data/pilot/kupang/README.md).

@@ -30,8 +30,8 @@ const MENU=[
  ['laporan','Laporan','doc']
 ];
 const MENU_B=[['bantuan','Bantuan','help']];
-const LOGO='<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="8" fill="#FFD200"/><path d="M6 27c4-2 8 2 12 0s8-2 12 0 4 0 4 0" stroke="#1a4fa0" stroke-width="2.2" fill="none"/><path d="M6 31.5c4-2 8 2 12 0s8-2 12 0 4 0 4 0" stroke="#1a4fa0" stroke-width="2.2" fill="none"/><path d="M22 5 13 20h7l-3 9 10-15h-7l2-9z" fill="#e1251b"/></svg>';
-$('rail').innerHTML=`<div class="logo" title="PLN">${LOGO}<b>PLN</b></div>`+
+const LOGO='<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#123b45"/><path d="M28 13a12 12 0 1 0 1 13V20H20" stroke="#d6f28a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="29" cy="10" r="3" fill="#f4c76a"/></svg>';
+$('rail').innerHTML=`<div class="logo" title="Georensis Solar">${LOGO}<b>GEO</b></div>`+
  MENU.map(([id,l,i])=>`<button data-page="${id}" data-label="${l}" aria-label="${l}">${ic(i)}</button>`).join('')+
  `<div class="sp"></div>`+MENU_B.map(([id,l,i])=>`<button data-page="${id}" data-label="${l}" aria-label="${l}">${ic(i)}</button>`).join('')+
  `<button id="bellBtn" data-act="notif" data-label="Notifikasi" aria-label="Notifikasi">${ic('bell')}</button><div class="avatar" title="Pengguna demo">SR</div><button data-act="logout" data-label="Keluar" aria-label="Keluar">${ic('out')}</button>`;
@@ -56,7 +56,7 @@ let _sv;
 function save(){clearTimeout(_sv);_sv=setTimeout(()=>{try{localStorage.setItem(STORE,JSON.stringify({v:1,gis:D.gis,lands:D.lands,provinces:D.provinces,rows:D.rows,sl:[...S.sl],W,T,HA,RAD,NET,notif:N,logs:LOGS}))}catch(e){}},400)}
 const opt=(v,l,cur)=>`<option value="${esc(v)}" ${String(v)===String(cur)?'selected':''}>${esc(l)}</option>`;
 function selBox(key,label,options,cur){return `<label>${label}<select data-in="${key}">${options.map(o=>Array.isArray(o)?opt(o[0],o[1],cur):opt(o,o,cur)).join('')}</select></label>`}
-const provOpts=(all='Semua provinsi')=>[['',all],...[...D.provinces].sort((a,b)=>a.short.localeCompare(b.short)).map(p=>[p.key,p.short])];
+const provOpts=(all='Semua provinsi',wil='')=>[['',all],...D.provinces.filter(p=>!wil||p.wil===wil).sort((a,b)=>a.short.localeCompare(b.short)).map(p=>[p.key,p.short])];
 const uniq=(arr)=>[...new Set(arr)].filter(x=>x!=null&&x!=='').sort((a,b)=>String(a).localeCompare(String(b)));
 function rowsAll(){return D.rows.filter(r=>(S.scen==='B'?r.inB:r.inA)&&(S.jenis==='all'||r.jenis===S.jenis))}
 const YEARS=[2025,2026,2027,2028,2029,2030,2031,2032,2033,2034];
@@ -193,22 +193,20 @@ function bdRingkasan(){
 /* =====================================================================
    2. TARGET RUPTL
    ===================================================================== */
+function normalizeRuptlProvince(){
+  const f=F.ruptl;
+  if(f.prov&&(!PROV[f.prov]||(f.wil&&PROV[f.prov].wil!==f.wil)))f.prov='';
+}
 function ruptlFiltered(){
+  normalizeRuptlProvince();
   const f=F.ruptl,q=f.q.toLowerCase();
   return rowsAll().filter(r=>(!f.wil||(PROV[r.prov]&&PROV[r.prov].wil===f.wil))&&(!f.prov||r.prov===f.prov)&&(!f.status||r.status===f.status)&&(!f.dev||r.dev===f.dev)&&(!f.kat||r.kat===f.kat)&&(!q||(r.nama+' '+r.sis+' '+r.prov).toLowerCase().includes(q)));
 }
 function pgBeranda(){
- const plans=rowsAll();
- const planned=plans.reduce((s,r)=>s+(Number(r.mw)||0),0);
- const link=(page,title,desc,note)=>`<button class="entry-action" data-page="${page}"><span class="entry-title">${title}</span><span class="entry-desc">${desc}</span><span class="entry-note">${note} →</span></button>`;
- return `<section class="home-intro"><div class="home-overline">GEORENSIS SOLAR · WORKSPACE DEMO</div><h1>Mulai dari proyek, bukan dari peta.</h1><p>Tentukan lokasi lahan atau titik GI terlebih dahulu. Bandingkan alternatif lokasi dan koneksi ke GI 70/150 kV. Seluruh aset, kandidat, dan parameter operasional pada demo adalah simulasi.</p></section>
- <div class="home-metrics"><div><span>GI simulasi</span><b>${D.gis.filter(g=>g.kv===70||g.kv===150).length}</b></div><div><span>Kandidat lahan sintetis</span><b>${D.lands.length.toLocaleString('id-ID')}</b></div><div><span>Baris rencana RUPTL</span><b>${plans.length}</b></div><div><span>Target skenario terpilih</span><b>${nf0(planned)} MW</b></div></div>
- <h2 class="home-section-title">Pilih alur kerja</h2><div class="entry-grid">
- ${link('lahan','01 / Land-first','Mulai dari kandidat lahan dan identifikasi GI terdekat.','Jelajahi kandidat')}
- ${link('gi','02 / Grid-first','Mulai dari GI 70/150 kV dan periksa lahan di sekitarnya.','Buka daftar GI')}
- ${link('ruptl','03 / Project pipeline','Telusuri rencana PLTS dan PLTS + BESS berdasarkan skenario RUPTL.','Lihat rencana')}
- ${link('peta','04 / GIS explorer','Jelajahi potensi nasional, provinsi, GI, dan koridor ilustratif.','Buka peta')}
- </div><section class="sec home-disclaimer"><h3>Batas kemampuan versi ini</h3><p>Jarak geografis, scoring dan routing SUTT/SKTT masih bersifat pra-screening. Belum ada data bidang tanah resmi, ROW terverifikasi, data akses jalan konstruksi, hasil studi P2B, ataupun estimasi biaya proyek yang telah tervalidasi.</p></section>`;
+ return `<section class="home-intro"><div class="home-overline">GEORENSIS SOLAR</div><h1>Dari bidang lahan ke alternatif koneksi.</h1><p>Pilih lokasi, lengkapi data sekitar, lalu bandingkan koridor SUTT dan SKTT menuju GI kandidat. Satu proyek, satu alur kerja.</p><button class="btn pri home-start" data-page="screening">Mulai screening ?</button></section>
+ <div class="home-journey"><div><b>01</b><h3>Pilih lahan</h3><p>Gambar bidang atau unggah GeoJSON.</p></div><div><b>02</b><h3>Bandingkan alternatif</h3><p>Lengkapi sumber data dan tinjau GI serta koridor.</p></div><div><b>03</b><h3>Bagikan hasil</h3><p>Unduh laporan HTML mandiri atau paket data kajian.</p></div></div>
+ <section class="sec"><h3>Referensi pendukung</h3><p class="sd">Buka bila diperlukan untuk melengkapi proyek.</p><div class="screen-actions"><button class="btn" data-page="gi">Daftar GI</button><button class="btn" data-page="ruptl">Rencana RUPTL</button><button class="btn" data-page="peta">Jelajahi peta demo</button></div></section>
+ <section class="sec home-disclaimer"><h3>Aplikasi portabel</h3><p>Versi satu file HTML dapat dibuka langsung di browser dan dikirim tanpa hosting. Data proyek hanya ada di browser penerima. Data online dan peta dasar memerlukan internet; data demo dan unggahan tetap dapat dipakai tanpa koneksi.</p><p class="sd">Screening geografis bersifat indikatif. Data demo bukan aset terverifikasi; kajian interkoneksi dilakukan di luar aplikasi.</p></section>`;
 }
 function pgGI(){
  const f=F.gi;const q=f.q.trim().toLowerCase();
@@ -218,10 +216,11 @@ function pgGI(){
  <div id="pgBody"><div class="tblwrap"><table><thead><tr><th>GI</th><th>Provinsi</th><th>Kabupaten/Kota</th><th>Tegangan</th><th>Sistem</th><th>Jumlah lahan demo</th><th>Aksi</th></tr></thead><tbody>${all.map(g=>`<tr><td><b>${esc(g.nama)}</b></td><td>${esc(PROV[g.prov].short)}</td><td>${esc(g.kab)}</td><td>${g.kv} kV</td><td>${esc(g.sistem)}</td><td>${g.lands.length}</td><td>${btn('giMap','Lihat peta & lahan','map','sm',`data-id="${g.id}"`)}</td></tr>`).join('')}</tbody></table></div><p class="fnote">Kapasitas, beban trafo, bay, ruang interkoneksi, dan legalitas lahan belum merupakan hasil validasi teknik.</p></div>`;
 }
 function pgRuptl(){
+  normalizeRuptlProvince();
   const f=F.ruptl;
   return pageHead('ruptl','Daftar rencana PLTS dan PLTS + BESS dari RUPTL 2025–2034, diambil dari file Excel. Pakai filter untuk menyaring.',filtersHTML()+btn('csvRuptl','Unduh CSV','dl'))+
   `<div class="fbar">${selBox('f:ruptl:wil','Wilayah operasi',[['','Semua wilayah'],...uniq(D.provinces.map(p=>p.wil))],f.wil)}
-   ${selBox('f:ruptl:prov','Provinsi',provOpts(),f.prov)}
+   ${selBox('f:ruptl:prov','Provinsi',provOpts('Semua provinsi',f.wil),f.prov)}
    ${selBox('f:ruptl:status','Status',[['','Semua status'],...uniq(D.rows.map(r=>r.status))],f.status)}
    ${selBox('f:ruptl:dev','Pengembang',[['','Semua pengembang'],...uniq(D.rows.map(r=>r.dev))],f.dev)}
    ${selBox('f:ruptl:kat','Kategori lokasi',[['','Semua kategori'],...uniq(D.rows.map(r=>r.kat))],f.kat)}
@@ -568,7 +567,7 @@ function bdLaporan(){
   const t1=p?`<table class="rt"><thead><tr><th>Gardu induk</th><th>Tegangan</th><th>Sistem</th><th class="n">Lahan</th><th class="n">Luas (Ha)</th><th class="n">Potensi (MWp)</th></tr></thead><tbody>${p.gis.map(id=>GI[id]).map(g=>{const x=landsOfGI(g);return `<tr><td>${esc(g.nama)}</td><td>${g.kv} kV</td><td>${esc(g.sistem)}</td><td class="n">${x.length}</td><td class="n">${nf(sumBy(x,l=>l.luas))}</td><td class="n">${nf(sumBy(x,l=>l.mwp))}</td></tr>`}).join('')}</tbody></table>`
    :`<table class="rt"><thead><tr><th>Provinsi</th><th class="n">Target (MW)</th><th class="n">Proyek</th><th class="n">GI</th><th class="n">Lahan</th><th class="n">Lahan layak (MWp)</th><th class="n">Keterpenuhan</th></tr></thead><tbody>${st.filter(x=>x.s.mw>0).sort((a,b)=>b.s.mw-a.s.mw).map(({p,s})=>`<tr><td>${esc(p.short)}</td><td class="n">${nf(s.mw)}</td><td class="n">${s.n}</td><td class="n">${p.gis.length}</td><td class="n">${s.ls.length}</td><td class="n">${nf(s.mwpGood)}</td><td class="n">${nf0(s.mwpGood/s.mw*100)}%</td></tr>`).join('')}</tbody></table>`;
   return `<div class="paper" id="report">
-   <div class="rh"><div>${LOGO}</div><div><b>PT PLN (Persero)</b><span>Laporan Potensi Lahan PLTS</span></div><div class="rd">${d}</div></div>
+   <div class="rh"><div>${LOGO}</div><div><b>Georensis Solar</b><span>Laporan Potensi Lahan PLTS</span></div><div class="rd">${d}</div></div>
    <h2>Potensi lahan PLTS ${p?'Provinsi '+esc(p.short):'nasional'}</h2>
    <p class="rs">Acuan target: RUPTL 2025–2034 skenario ${SCEN[S.scen]}${S.jenis!=='all'?', jenis '+S.jenis:', PLTS dan PLTS + BESS'}.</p>
    <h3>1. Ringkasan</h3>
@@ -710,6 +709,7 @@ document.addEventListener('input',e=>{
   if(k.startsWith('f:')){const[,pg,fld]=k.split(':');F[pg][fld]=t.value;
     if(pg==='lahan'){F.lahan.page=0;if(fld==='prov'){F.lahan.gi='';renderPage();return}}
     if(pg==='gi'){renderPage();return}
+    if(pg==='ruptl'&&(fld==='wil'||fld==='prov')){normalizeRuptlProvince();renderPage();return}
     refreshBody();
     if(t.tagName==='INPUT'){const n=document.querySelector(`[data-in="${k}"]`);if(n&&n!==t){n.focus();const L=n.value.length;try{n.setSelectionRange(L,L)}catch(_){}}}
     return}

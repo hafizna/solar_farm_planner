@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "web/**"
+      - "data/pilot/**"
       - ".github/workflows/web-ci.yml"
   pull_request:
     paths:
@@ -21,8 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm run build
+      - run: npm run test:unit
       - name: Verify static assets and JavaScript syntax
         run: |
           test -s dist/index.html
@@ -30,7 +32,8 @@ jobs:
           test -s dist/leaflet/leaflet.css
           test -s dist/assets/demo-data.js
           test -s dist/assets/pages.js
-          for file in assets/*.js scripts/*.cjs; do node --check "$file"; done
+          test -s portable/georensis-solar.html
+          for file in assets/*.js scripts/*.cjs lib/*.cjs api/*.js; do node --check "$file"; done
       - name: Install Chromium for E2E tests
         run: npx playwright install --with-deps chromium
       - name: Test entry, navigation, data pages and logout

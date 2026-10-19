@@ -11,7 +11,7 @@
     document.body.classList.toggle('demo-locked',!valid);
     if(valid){
       if(avatar){avatar.textContent=session.name.trim().slice(0,2).toUpperCase();avatar.title=session.name+' — '+session.role+' (demo)'}
-      goPage(window.GEORENSIS_PORTABLE?'peta':'beranda');
+      goPage('beranda');
     }else{
       if(avatar){avatar.textContent='DEMO';avatar.title='Belum masuk'}
       document.getElementById('demoUserName')?.focus();

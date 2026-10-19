@@ -38,3 +38,10 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Test entry, navigation, data pages and logout
         run: npm run test:e2e
+      - name: Attach portable standalone HTML for demo reviewers
+        uses: actions/upload-artifact@v4
+        with:
+          name: georensis-dpt-portable-html
+          path: web/portable/georensis-solar.html
+          if-no-files-found: error
+          retention-days: 7

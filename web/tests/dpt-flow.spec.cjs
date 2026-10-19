@@ -1,0 +1,22 @@
+const {test,expect}=require('@playwright/test');
+test('Commitment-to-DPT workflow starts from target and leaves prices unknown unless provided', async ({page})=>{
+ await page.route(/^https?:\/\/(?!127\.0\.0\.1:\d+)/,route=>route.abort());
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.locator('#demoUserName').fill('Analis DPT');
+ await page.locator('#demoLoginForm button').click();
+ await expect(page.locator('.dpt-entry')).toBeVisible();
+ await page.locator('.dpt-entry [data-page="dpt"]').click();
+ await expect(page.locator('#pageView')).toContainText('Definisikan komitmen');
+ await expect(page.locator('#pageView')).toContainText('Belum ada data harga');
+ await page.locator('[data-dpt-field="capacityBasis"]').selectOption('MWac');
+ await expect(page.locator('#pageView')).toContainText('Ekivalen AC');
+ await page.locator('[data-dpt-act="examples"]').click();
+ await expect(page.locator('#pageView')).toContainText('ANGKA CONTOH SINTETIS AKTIF');
+ await expect(page.locator('[data-dpt-row]').first()).toBeVisible();
+ await page.locator('[data-dpt-act="clear"]').click();
+ await expect(page.locator('#pageView')).toContainText('Belum ada data harga');
+ await page.locator('#rail [data-page="gi"]').click();
+ await expect(page.locator('#pageView tbody tr').first()).toBeVisible();
+ expect(errors).toEqual([]);
+});

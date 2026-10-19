@@ -608,3 +608,33 @@ body.demo-locked>.shell{filter:blur(4px);pointer-events:none;user-select:none}
 #ppRequests input{max-width:95px;border:1px solid var(--line);padding:7px;border-radius:6px;background:var(--surface);color:var(--ink)}#ppRequests small,#ppCandidates small{display:block;color:var(--muted);font-size:10px}.pp-map-pin{display:flex;align-items:center;justify-content:center;background:transparent;border:0}.pp-map-pin span{display:block;width:12px;height:12px;box-sizing:border-box;background:#194a3b;border:2px solid #fff;border-radius:3px;box-shadow:0 1px 4px #17382760;transform:rotate(45deg)}.pp-map-pin:hover span,.pp-map-pin:focus span{outline:2px solid #194a3b;outline-offset:2px}
 @media(max-width:1100px){.pp-map-layout{grid-template-columns:1fr}.pp-summary .pp-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.pp-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pp-intro{padding:22px}.pp-open{display:none}}
 @media(max-width:650px){.pp-intro{flex-direction:column;gap:8px}.pp-source-chip{border-left:0;border-top:1px solid #ffffff35;padding:12px 0 0;min-width:0}.pp-source-chip b{font-size:26px}.pp-steps{overflow-x:auto}.pp-steps button{padding:10px;font-size:11px;white-space:nowrap}.pp-form-grid{gap:10px}#ppMap{height:380px}.pp-summary .pp-stat-grid{grid-template-columns:1fr 1fr}.pp-exports{flex-direction:column;align-items:flex-start}.pp-source-list{grid-template-columns:1fr}.pp-weight-controls{width:100%}}
+
+
+.dpt-wrap{max-width:1530px;margin:0 auto;display:grid;gap:14px}
+.dpt-entry,.dpt-intro{background:#153d4d;color:#f2f7fa;padding:24px 30px;border-radius:10px;margin-bottom:14px}
+.dpt-entry h2,.dpt-intro h2{font-size:24px;font-weight:650;margin:8px 0 10px;line-height:1.25}
+.dpt-entry p,.dpt-intro p{max-width:870px;color:#d7e5e9;font-size:13px;line-height:1.65}
+.dpt-kicker{font-size:10px;color:#b2e5d3;font-weight:800;letter-spacing:.15em}
+.dpt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dpt-grid label{display:flex;flex-direction:column;gap:5px;color:var(--ink2);font-weight:600;font-size:11.5px}
+.dpt-grid label input,.dpt-grid label select,.dpt-table input,.dpt-table select{width:100%;padding:8px 10px;min-height:37px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:400}
+.dpt-span2{grid-column:span 2}
+.dpt-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0}
+.dpt-metrics>div{padding:13px;background:var(--surface2);border-radius:7px;border:1px solid var(--line)}
+.dpt-metrics small{display:block;font-size:10.5px;color:var(--muted);margin-bottom:5px}
+.dpt-metrics strong{display:block;font-size:21px;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums}
+.dpt-note{font-size:11.5px;color:var(--muted);line-height:1.55;margin:12px 0}
+.dpt-note b{color:var(--ink2)}
+.dpt-actions{margin:14px 0;flex-wrap:wrap}
+.dpt-table{font-size:11.5px;width:100%}
+.dpt-table td,.dpt-table th{padding:10px 8px;vertical-align:top}
+.dpt-table td small{display:block;font-size:10px;line-height:1.4;color:var(--muted)}
+.dpt-table td input{min-width:112px}.dpt-table td select{min-width:85px}
+.dpt-gate{display:inline-block;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:700}
+.dpt-gate.ok{background:var(--greenSoft);color:var(--green)}
+.dpt-gate.warn{background:var(--amberSoft);color:var(--amber)}
+.dpt-decision{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.dpt-decision>div{border:1px solid var(--line);border-left:3px solid var(--blue2);background:var(--surface2);padding:13px;border-radius:6px}
+.dpt-decision b{font-size:12px}.dpt-decision p{font-size:11.5px;color:var(--muted);line-height:1.55}
+@media(max-width:1050px){.dpt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dpt-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.dpt-decision{grid-template-columns:1fr}}
+@media(max-width:650px){.dpt-grid{grid-template-columns:1fr}.dpt-span2{grid-column:span 1}.dpt-entry,.dpt-intro{padding:20px}.dpt-entry h2,.dpt-intro h2{font-size:20px}}

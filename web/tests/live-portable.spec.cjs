@@ -29,11 +29,17 @@ test('portable application opens as one file with network disabled',async({page}
  await expect(page.locator('#demoTitle')).toHaveText('Masuk ke Georensis');
  await expect(page.locator('#demoRole')).toBeHidden();
  await page.locator('#demoUserName').fill('Portable user');await page.locator('#demoLoginForm button').click();
- await expect(page.locator('#map')).toBeVisible();await expect(page.locator('#demoGate')).toBeHidden();
- await expect(page.locator('#rail [data-page="screening"]')).toHaveCount(0);await expect(page.locator('#rail [data-page="beranda"]')).toHaveCount(0);
+ await expect(page.locator('#demoGate')).toBeHidden();
+ await expect(page.locator('.dpt-entry')).toBeVisible();
+ await expect(page.locator('#rail [data-page="screening"]')).toHaveCount(0);
+ await expect(page.locator('#rail [data-page="beranda"]')).toHaveCount(1);
+ await expect(page.locator('#rail [data-page="dpt"]')).toHaveCount(1);
+ await page.locator('#rail [data-page="dpt"]').click();
+ await expect(page.locator('#pageView')).toContainText('Definisikan komitmen');
  await page.locator('#rail [data-page="ruptl"]').click();await expect(page.locator('#pageView tbody tr').first()).toBeVisible();
- // Breadcrumb home also returns to the map, without exposing the skipped workflow.
- await page.locator('#pageView [data-page="beranda"]').click();await expect(page.locator('#map')).toBeVisible();
+ // Breadcrumb now returns to programme-first home; map is available explicitly.
+ await page.locator('#pageView [data-page="beranda"]').click();await expect(page.locator('.dpt-entry')).toBeVisible();
+ await page.locator('#rail [data-page="peta"]').click();await expect(page.locator('#map')).toBeVisible();
  await page.locator('#rail [data-act="logout"]').click();await expect(page.locator('#demoGate')).toBeVisible();
  expect(await page.evaluate(()=>window.GEORENSIS_PORTABLE)).toBe(true);expect(localFiles).toHaveLength(1);expect(errors).toEqual([]);
 });
